@@ -17,6 +17,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    if ([application respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeSound categories:nil];
+        [application registerUserNotificationSettings:settings];
+    }
+    
     return YES;
 }
 
@@ -28,6 +33,7 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -122,6 +128,33 @@
             abort();
         }
     }
+}
+
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+    
+    //self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    UIViewController *viewController;
+    
+    // アプリ起動中(フォアグラウンド)に通知が届いた場合
+    if(application.applicationState == UIApplicationStateActive) {
+        // ここに処理を書く
+        viewController = [storyboard instantiateViewControllerWithIdentifier:@"phone"];
+    }
+    
+    // アプリがバックグラウンドにある状態で通知が届いた場合
+    if(application.applicationState == UIApplicationStateInactive) {
+        // ここに処理を書く
+        viewController = [storyboard instantiateViewControllerWithIdentifier:@"phone"];
+    }
+    
+    // 通知領域から削除する
+    [[UIApplication sharedApplication] cancelLocalNotification:notification];
+    
+    self.window.rootViewController = viewController;
+    [self.window makeKeyAndVisible];
+    
 }
 
 @end
